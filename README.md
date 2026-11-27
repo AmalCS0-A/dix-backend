@@ -195,7 +195,7 @@ The API runs on `http://localhost:3000`. Quick check: open it in a browser, it a
 Then start the frontend in a second terminal:
 
 ```bash
-git clone https://github.com/AmalCS0-A/dix-kits
+git clone -b tp4 https://github.com/AmalCS0-A/dix-kits
 cd dix-kits
 npm install
 npm run dev               # http://localhost:5173
