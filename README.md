@@ -3,7 +3,7 @@
 **Student:** Amel Bouterbag
 **Module:** WAMD, TD-TP 4 (builds on TD-TP 3), ENSTA SS/IA 2026
 
-**Frontend repository (React):** https://github.com/AmalCS0-A/dix-kits
+**Frontend repository (React):** https://github.com/AmalCS0-A/dix-kits/tree/tp4
 
 ## Application description
 
