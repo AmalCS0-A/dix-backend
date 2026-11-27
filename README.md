@@ -1,25 +1,31 @@
-# DIX Maillots API
+# DIX Maillots: full-stack e-commerce (backend)
 
 **Student:** Amel Bouterbag
-**Module:** WAMD, TD-TP 3, ENSTA SS/IA 2026
+**Module:** WAMD, TD-TP 4 (builds on TD-TP 3), ENSTA SS/IA 2026
+
+**Frontend repository (React):** https://github.com/AmalCS0-A/dix-kits
 
 ## Application description
 
 REST API for the DIX Maillots football-shirt store built in TD-TP 2 (React + Redux).
 It replaces the products array of the React app with a MongoDB database and adds
 user registration, login, JWT authentication, OAuth2 testing and rate limiting.
+In TD-TP 4 the React app is connected to this API: it loads the products from MongoDB,
+lets users register and log in, and lets logged-in users add, update and delete products.
 
 ```
 React (TP2)  --HTTP/JSON-->  Express API (Node.js)  --Mongoose-->  MongoDB
 ```
 
 React never talks to MongoDB directly. The 52 shirts of TP2 are loaded into the
-database with a seed script. The cart stays managed by Redux (out of scope for TP3).
+database with a seed script. The cart and favorites stay managed by Redux.
 
 ## Technologies used
 
 | Tool | Purpose |
 | --- | --- |
+| React 18, Redux Toolkit, React-Redux, Vite | Frontend (other repository) |
+| Fetch API | HTTP requests from React to the API |
 | Node.js | Backend runtime |
 | Express 5 | Web framework, routes, middleware |
 | MongoDB Atlas | NoSQL database |
@@ -114,7 +120,7 @@ Create product:
 ## API testing (Postman)
 
 The tests are in `docs/DIX-TP3.postman_collection.json` (Postman: Import, then choose the file).
-The screenshots are in the `screenshots/` folder. Each one shows the request and the response status.
+The screenshots of tests 01 to 17 are in the `screenshots/` folder. Each one shows the request and the response status.
 
 | # | Test | Expected |
 | --- | --- | --- |
@@ -155,6 +161,22 @@ See `docs/OAUTH2_POSTMAN.md`.
 Passwords are hashed with bcrypt (cost 10) before storage. The JWT secret is read from an
 environment variable and is never in the code.
 
+## Frontend integration (TD-TP 4)
+
+- All HTTP requests are in one file, `src/api/client.js` (Fetch API). It adds the JWT header,
+  turns error responses into messages, and stops waiting after 15 seconds.
+- Redux thunks (`src/store/thunks.js`) call the API, then update the store.
+- `src/data/toShirt.js` adapts an API product for the TP2 components. Drawing details
+  (colours, pattern, shirt number) stay in the frontend; the business data comes from MongoDB.
+- After registration the app logs in automatically. The token and user are kept in
+  `localStorage`, so a page refresh keeps the session. This is simple, but a script injected
+  in the page (XSS) could read it; an HttpOnly cookie would be safer in production.
+- Logging out removes the token in the browser. If the API answers 401 to a product
+  change (invalid or expired token), the app logs out and asks the user to log in again.
+- Any logged-in user can manage products (roles are not implemented).
+- The app shows a loading state, an error message with a retry button when the product
+  list cannot be loaded, and form errors for refused requests.
+
 ## Installation and running
 
 Requirements: Node.js 20 or newer and a MongoDB Atlas account.
@@ -169,6 +191,18 @@ npm run dev               # development, restarts on file changes
 
 The API runs on `http://localhost:3000`. Quick check: open it in a browser, it answers
 `{"name":"DIX Maillots API","status":"running"}`.
+
+Then start the frontend in a second terminal:
+
+```bash
+git clone https://github.com/AmalCS0-A/dix-kits
+cd dix-kits
+npm install
+npm run dev               # http://localhost:5173
+```
+
+The frontend calls `http://localhost:3000/api` by default. To change this address, copy its
+`.env.example` to `.env` and edit `VITE_API_URL`.
 
 ## MongoDB and environment variables
 
